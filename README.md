@@ -1,6 +1,6 @@
-# Madlen AI Case Study
+# AI CHATBOT
 
-Bu proje, Madlen Case Study kapsamında geliştirilmiş, modern, kullanıcı dostu ve çok modlu (multi-modal) bir yapay zeka sohbet uygulamasıdır. Google Gemini arayüzünden esinlenilerek tasarlanmış olup, gerçek zamanlı yanıt akışı (streaming), görsel analiz yeteneği ve geçmiş sohbet yönetimi gibi özellikler sunar.
+Bu proje, modern, kullanıcı dostu ve çok modlu (multi-modal) bir yapay zeka sohbet uygulamasıdır. Google Gemini arayüzünden esinlenilerek tasarlanmış olup, gerçek zamanlı yanıt akışı (streaming), görsel analiz yeteneği ve geçmiş sohbet yönetimi gibi özellikler sunar.
 
 ## 🚀 Özellikler
 
