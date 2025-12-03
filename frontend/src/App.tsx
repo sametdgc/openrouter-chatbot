@@ -11,6 +11,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [models, setModels] = useState<{ id: string; name: string }[]>([]);
   const [selectedModel, setSelectedModel] = useState("google/gemini-2.0-flash-exp:free");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -51,6 +52,18 @@ function App() {
     setMessages([]);
   };
 
+  const handleDeleteSession = async (id: number) => {
+    try {
+      await api.deleteSession(id);
+      setSessions((prev) => prev.filter((s) => s.id !== id));
+      if (currentSessionId === id) {
+        handleNewChat();
+      }
+    } catch (error) {
+      console.error("Failed to delete session", error);
+    }
+  };
+
   const handleAbort = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -59,7 +72,7 @@ function App() {
     }
   };
 
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = async (content: string, imageBase64?: string) => {
     // 1. Optimistic UI
     const tempUserMsg: Message = { role: "user", content };
     const tempAiMsg: Message = { role: "assistant", content: "", model_used: selectedModel };
@@ -97,7 +110,8 @@ function App() {
                 api.getSessions().then(setSessions);
             }
         },
-        abortControllerRef.current.signal
+        abortControllerRef.current.signal,
+        imageBase64
       );
     } catch (error: any) {
       if (error.name === 'AbortError') {
@@ -118,12 +132,15 @@ function App() {
 
   return (
     <div className="h-screen w-full flex overflow-hidden bg-white font-sans">
-      <ChatSidebar 
-        sessions={sessions}
-        currentSessionId={currentSessionId}
-        onSelectSession={loadSession}
-        onNewChat={handleNewChat}
-      />
+      {isSidebarOpen && (
+        <ChatSidebar 
+          sessions={sessions}
+          currentSessionId={currentSessionId}
+          onSelectSession={loadSession}
+          onNewChat={handleNewChat}
+          onDeleteSession={handleDeleteSession}
+        />
+      )}
       <ChatWindow 
         messages={messages}
         models={models}
@@ -132,6 +149,8 @@ function App() {
         onModelChange={setSelectedModel}
         onSendMessage={handleSendMessage}
         onAbort={handleAbort}
+        isSidebarOpen={isSidebarOpen}
+        onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
       />
     </div>
   );

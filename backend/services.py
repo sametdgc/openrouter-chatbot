@@ -22,7 +22,7 @@ def fetch_available_models():
         {"id": "microsoft/phi-3-mini-128k-instruct:free", "name": "Phi-3 Mini (Free)"},
     ]
 
-def call_openrouter_api(messages: list, model: str):
+def call_openrouter_api(messages: list, model: str, image_base64: str = None):
     """
     Sends the chat history to OpenRouter and yields chunks of content.
     """
@@ -32,6 +32,19 @@ def call_openrouter_api(messages: list, model: str):
         "HTTP-Referer": "http://localhost:5173", 
         "X-Title": "Madlen Case Study"
     }
+
+    # Handle Image Payload
+    if image_base64:
+        # Get the last user message (which is the current one)
+        last_msg = messages[-1]
+        if last_msg["role"] == "user":
+            last_msg["content"] = [
+                {"type": "text", "text": last_msg["content"]},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": f"data:image/jpeg;base64,{image_base64}"}
+                }
+            ]
 
     payload = {
         "model": model,

@@ -45,6 +45,12 @@ export const api = {
     return res.data;
   },
 
+  // Delete a session
+  deleteSession: async (sessionId: number) => {
+    const res = await axios.delete(`${API_URL}/sessions/${sessionId}`);
+    return res.data;
+  },
+
   // Send a message to the AI (Streaming)
   streamMessage: async (
     content: string, 
@@ -52,12 +58,18 @@ export const api = {
     sessionId: number | undefined,
     onChunk: (chunk: string) => void,
     onSessionId: (id: number) => void,
-    signal: AbortSignal
+    signal: AbortSignal,
+    imageBase64?: string
   ) => {
     const response = await fetch(`${API_URL}/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content, model, session_id: sessionId }),
+      body: JSON.stringify({ 
+        content, 
+        model, 
+        session_id: sessionId,
+        image_base64: imageBase64 
+      }),
       signal
     });
 

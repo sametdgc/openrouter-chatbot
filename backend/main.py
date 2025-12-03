@@ -31,6 +31,7 @@ class MessageCreate(BaseModel):
     session_id: Optional[int] = None
     content: str
     model: str = "google/gemini-2.0-flash-exp:free"
+    image_base64: Optional[str] = None
 
 class SessionResponse(BaseModel):
     id: int
@@ -73,6 +74,15 @@ def get_session_history(session_id: int, db: Session = Depends(get_db)):
     messages = db.query(ChatMessage).filter(ChatMessage.session_id == session_id).all()
     return messages
 
+@app.delete("/sessions/{session_id}")
+def delete_session(session_id: int, db: Session = Depends(get_db)):
+    session = db.query(ChatSession).filter(ChatSession.id == session_id).first()
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    db.delete(session)
+    db.commit()
+    return {"message": "Session deleted"}
+
 @app.post("/chat")
 def chat(request: MessageCreate, db: Session = Depends(get_db)):
     # 1. Create a session if one doesn't exist
@@ -106,7 +116,7 @@ def chat(request: MessageCreate, db: Session = Depends(get_db)):
     def event_generator():
         full_response = ""
         try:
-            for chunk in call_openrouter_api(formatted_messages, request.model):
+            for chunk in call_openrouter_api(formatted_messages, request.model, request.image_base64):
                 full_response += chunk
                 yield chunk
         except Exception as e:

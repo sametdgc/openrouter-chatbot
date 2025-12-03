@@ -1,9 +1,7 @@
 
 import { type Session } from "@/api";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Plus, MessageSquare, Bot } from "lucide-react";
+import { Plus, MessageSquare, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ChatSidebarProps {
@@ -11,9 +9,10 @@ interface ChatSidebarProps {
   currentSessionId: number | undefined;
   onSelectSession: (id: number) => void;
   onNewChat: () => void;
+  onDeleteSession: (id: number) => void;
 }
 
-export function ChatSidebar({ sessions, currentSessionId, onSelectSession, onNewChat }: ChatSidebarProps) {
+export function ChatSidebar({ sessions, currentSessionId, onSelectSession, onNewChat, onDeleteSession }: ChatSidebarProps) {
   return (
     <div className="w-[280px] bg-[#f0f4f9] flex flex-col h-full hidden md:flex overflow-y-auto shrink-0">
       {/* App Header */}
@@ -37,18 +36,30 @@ export function ChatSidebar({ sessions, currentSessionId, onSelectSession, onNew
         </div>
         <div className="space-y-1">
           {sessions.map((session) => (
-            <Button
-              key={session.id}
-              variant="ghost"
-              className={cn(
-                "w-full justify-start text-sm font-normal truncate h-auto py-2 px-3 rounded-full hover:bg-[#dde3ea]",
-                currentSessionId === session.id && "bg-[#d3e3fd] text-[#001d35] hover:bg-[#d3e3fd]"
-              )}
-              onClick={() => onSelectSession(session.id)}
-            >
-              <MessageSquare size={16} className="mr-2 shrink-0 opacity-70" />
-              <span className="truncate">{session.title}</span>
-            </Button>
+            <div key={session.id} className="group relative flex items-center">
+              <Button
+                variant="ghost"
+                className={cn(
+                  "w-full justify-start text-sm font-normal truncate h-auto py-2 px-3 rounded-full hover:bg-[#dde3ea] pr-8",
+                  currentSessionId === session.id && "bg-[#d3e3fd] text-[#001d35] hover:bg-[#d3e3fd]"
+                )}
+                onClick={() => onSelectSession(session.id)}
+              >
+                <MessageSquare size={16} className="mr-2 shrink-0 opacity-70" />
+                <span className="truncate">{session.title}</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-red-500 hover:bg-transparent"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (confirm("Delete this chat?")) onDeleteSession(session.id);
+                }}
+              >
+                <Trash2 size={14} />
+              </Button>
+            </div>
           ))}
         </div>
       </div>
