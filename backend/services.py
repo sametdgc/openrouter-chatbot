@@ -17,6 +17,9 @@ def fetch_available_models():
     # of high-quality free models.
     return [
         {"id": "google/gemini-2.0-flash-exp:free", "name": "Google Gemini 2.0 Flash (Free)"},
+        {"id": "google/gemma-3-27b-it:free", "name": "Google Gemma 3 27B (Free)"},
+        {"id": "google/gemma-3-4b-it:free", "name": "Google Gemma 3 4B (Free)"},
+        {"id": "x-ai/grok-4.1-fast:free", "name": "xAI Grok 4.1 Fast (Free)"},
         {"id": "mistralai/mistral-7b-instruct:free", "name": "Mistral 7B (Free)"},
         {"id": "meta-llama/llama-3-8b-instruct:free", "name": "Llama 3 8B (Free)"},
         {"id": "microsoft/phi-3-mini-128k-instruct:free", "name": "Phi-3 Mini (Free)"},

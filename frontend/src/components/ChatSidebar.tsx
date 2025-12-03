@@ -1,8 +1,16 @@
-
+import { useState } from "react";
 import { type Session } from "@/api";
 import { Button } from "@/components/ui/button";
 import { Plus, MessageSquare, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface ChatSidebarProps {
   sessions: Session[];
@@ -13,8 +21,25 @@ interface ChatSidebarProps {
 }
 
 export function ChatSidebar({ sessions, currentSessionId, onSelectSession, onNewChat, onDeleteSession }: ChatSidebarProps) {
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [sessionToDelete, setSessionToDelete] = useState<number | null>(null);
+
+  const handleDeleteClick = (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
+    setSessionToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (sessionToDelete !== null) {
+      onDeleteSession(sessionToDelete);
+      setDeleteDialogOpen(false);
+      setSessionToDelete(null);
+    }
+  };
+
   return (
-    <div className="w-[280px] bg-[#f0f4f9] flex flex-col h-full hidden md:flex overflow-y-auto shrink-0">
+    <div className="w-[280px] bg-[#f0f4f9] flex-col h-full hidden md:flex overflow-y-auto shrink-0">
       {/* App Header */}
       <div className="p-4 sticky top-0 bg-[#f0f4f9] z-10">
         <div className="flex items-center gap-2 mb-6 font-bold text-xl text-slate-700 px-2">
@@ -52,10 +77,7 @@ export function ChatSidebar({ sessions, currentSessionId, onSelectSession, onNew
                 variant="ghost"
                 size="icon"
                 className="absolute right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-red-500 hover:bg-transparent"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (confirm("Delete this chat?")) onDeleteSession(session.id);
-                }}
+                onClick={(e) => handleDeleteClick(e, session.id)}
               >
                 <Trash2 size={14} />
               </Button>
@@ -63,6 +85,21 @@ export function ChatSidebar({ sessions, currentSessionId, onSelectSession, onNew
           ))}
         </div>
       </div>
+
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Chat?</DialogTitle>
+            <DialogDescription>
+              This will permanently delete this chat session. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={confirmDelete}>Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
